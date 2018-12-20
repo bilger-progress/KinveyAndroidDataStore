@@ -20,9 +20,24 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation ':kinvey-android:+@aar'
+    implementation ':relinker:+@aar'
+    implementation ':realm-android-library:+@aar'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    annotationProcessor files('libs/pubnub-gson-4.18.0-all.jar')
+    annotationProcessor files('libs/realm-annotations-processor-3.2.1.jar')
+}
+
+buildscript {
+    repositories {
+        jcenter() // or mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.3.1'
+    }
 }
