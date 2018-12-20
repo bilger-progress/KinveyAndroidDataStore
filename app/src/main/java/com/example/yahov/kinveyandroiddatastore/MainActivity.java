@@ -8,9 +8,14 @@ import android.widget.Toast;
 
 import com.kinvey.android.Client;
 import com.kinvey.android.callback.KinveyPingCallback;
+import com.kinvey.android.callback.KinveyReadCallback;
 import com.kinvey.android.model.User;
+import com.kinvey.android.store.DataStore;
 import com.kinvey.android.store.UserStore;
+import com.kinvey.java.Query;
 import com.kinvey.java.core.KinveyClientCallback;
+import com.kinvey.java.model.KinveyReadResponse;
+import com.kinvey.java.store.StoreType;
 
 import java.io.IOException;
 
@@ -23,8 +28,10 @@ public class MainActivity extends AppCompatActivity {
     private String kinveyInstanceID = "xxx";
     private String kinveyUserName = "xxx";
     private String kinveyUserPassword = "xxx";
+    private String kinveyCollection = "xxx";
     private Button kinveyLoginButton;
     private Button kinveyDataStoreFindButton;
+    private DataStore<Book> dataStore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
         // Set-up Kinvey backend.
         kinveyClient = new Client.Builder(this.kinveyAppKey, this.kinveyAppSecret, this)
                 .setInstanceID(this.kinveyInstanceID).build();
+
+        dataStore = DataStore.collection(this.kinveyCollection, Book.class, StoreType.NETWORK, kinveyClient);
 
         // Ping Kinvey backend to check connection.
         kinveyClient.ping(new KinveyPingCallback() {
@@ -66,11 +75,7 @@ public class MainActivity extends AppCompatActivity {
         kinveyDataStoreFindButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    KinveyDataStoreFind();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                KinveyDataStoreFind();
             }
         });
     }
@@ -99,7 +104,21 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void KinveyDataStoreFind () throws IOException {
-        Toast.makeText(getApplicationContext(), "Woah!", Toast.LENGTH_LONG).show();
+    private void KinveyDataStoreFind () {
+        // TODO: Add the IDs that you want to search for.
+        Query query = kinveyClient.query().in("_id", new String[]{"xxx", "xxx"});
+        dataStore.find(query, new KinveyReadCallback<Book>(){
+            @Override
+            public void onSuccess(KinveyReadResponse<Book> books) {
+                Toast.makeText(getApplicationContext(), "Kinvey DataStore Find Successful", Toast.LENGTH_LONG).show();
+                System.out.println("Find: " + books.getResult());
+            }
+
+            @Override
+            public void onFailure(Throwable error) {
+                Toast.makeText(getApplicationContext(), "Exception was thrown. Check logs.", Toast.LENGTH_LONG).show();
+                System.out.println("Exception was thrown: " + error.getMessage());
+            }
+        });
     }
 }
