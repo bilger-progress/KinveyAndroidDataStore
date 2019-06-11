@@ -12,7 +12,6 @@ import com.kinvey.android.callback.KinveyReadCallback;
 import com.kinvey.android.model.User;
 import com.kinvey.android.store.DataStore;
 import com.kinvey.android.store.UserStore;
-import com.kinvey.java.Query;
 import com.kinvey.java.core.KinveyClientCallback;
 import com.kinvey.java.model.KinveyReadResponse;
 import com.kinvey.java.store.StoreType;
@@ -46,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         kinveyClient = new Client.Builder(this.kinveyAppKey, this.kinveyAppSecret, this)
                 .setInstanceID(this.kinveyInstanceID).build();
 
-        dataStore = DataStore.collection(this.kinveyCollection, Book.class, StoreType.NETWORK, kinveyClient);
+        dataStore = DataStore.collection(this.kinveyCollection, Book.class, StoreType.AUTO, kinveyClient);
 
         // Ping Kinvey backend to check connection.
         kinveyClient.ping(new KinveyPingCallback() {
@@ -105,9 +104,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void KinveyDataStoreFind () {
-        // TODO: Add the IDs that you want to search for.
-        Query query = kinveyClient.query().in("_id", new String[]{"xxx", "xxx"});
-        dataStore.find(query, new KinveyReadCallback<Book>(){
+        dataStore.find(new KinveyReadCallback<Book>(){
             @Override
             public void onSuccess(KinveyReadResponse<Book> books) {
                 Toast.makeText(getApplicationContext(), "Kinvey DataStore Find Successful", Toast.LENGTH_LONG).show();
